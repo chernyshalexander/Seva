@@ -1,0 +1,63 @@
+PLUGIN_SEVA
+	EN	Seva.ru Radio & Archive
+	RU	Радио Сева и архив
+
+PLUGIN_SEVA_DESC
+	EN	Play Radio Seva live stream, "Rock Posevy", and "Sevaoborot" archives
+	RU	Слушайте прямой эфир Радио Сева, а также архивы программ «Рок-посевы» и «Севаоборот»
+
+PLUGIN_SEVA_LIVE
+	EN	Radio Seva (Live Stream)
+	RU	Радио Сева (Прямой эфир)
+
+PLUGIN_SEVA_ROCK
+	EN	Rock Posevy (Archive)
+	RU	Рок-посевы (Архив)
+
+PLUGIN_SEVA_OBOROT
+	EN	Sevaoborot (Archive)
+	RU	Севаоборот (Архив)
+
+PLUGIN_SEVA_ARTIST
+	EN	Seva Novgorodsev
+	RU	Сева Новгородцев
+
+PLUGIN_SEVA_DEMOSTRATE_PHOTOS
+	EN	Show archive/stream photos
+	RU	Демонстрировать фотографии
+
+PLUGIN_SEVA_DEMOSTRATE_PHOTOS_DESC
+	EN	If enabled, periodically fetch and display photos from seva.ru during playback
+	RU	Если включено, периодически загружать и показывать фотографии с сайта seva.ru во время воспроизведения
+
+PLUGIN_SEVA_SETTING_ENABLE
+	EN	Enabled
+	RU	Включено
+
+PLUGIN_SEVA_SETTING_DISABLE
+	EN	Disabled
+	RU	Выключено
+
+PLUGIN_SEVA_PHOTO_INTERVAL
+	EN	Photo update interval
+	RU	Интервал обновления фотографий
+
+PLUGIN_SEVA_PHOTO_INTERVAL_DESC
+	EN	How often to update the background photo (30 seconds, 1 minute, 3 minutes, 5 minutes)
+	RU	Как часто обновлять фоновую фотографию (30 сек, 1 мин, 3 мин, 5 мин)
+
+PLUGIN_SEVA_INTERVAL_30S
+	EN	30 seconds
+	RU	30 секунд
+
+PLUGIN_SEVA_INTERVAL_1M
+	EN	1 minute
+	RU	1 минута
+
+PLUGIN_SEVA_INTERVAL_3M
+	EN	3 minutes
+	RU	3 минуты
+
+PLUGIN_SEVA_INTERVAL_5M
+	EN	5 minutes
+	RU	5 минут

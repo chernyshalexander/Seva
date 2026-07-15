@@ -1,0 +1,23 @@
+[% PROCESS settings/header.html %]
+
+    [% WRAPPER setting title="PLUGIN_SEVA_DEMOSTRATE_PHOTOS" desc="PLUGIN_SEVA_DEMOSTRATE_PHOTOS_DESC" %]
+    <div class="prefDesc">
+        <select name="pref_demostrate_photos" class="stdedit">
+                <option value="1"[% IF prefs.demostrate_photos == "1" %] selected[% END %]>[% 'PLUGIN_SEVA_SETTING_ENABLE' | getstring %]</option>
+                <option value="0"[% IF prefs.demostrate_photos == "0" %] selected[% END %]>[% 'PLUGIN_SEVA_SETTING_DISABLE' | getstring %]</option> 
+        </select>
+    </div>
+    [% END %]
+
+    [% WRAPPER setting title="PLUGIN_SEVA_PHOTO_INTERVAL" desc="PLUGIN_SEVA_PHOTO_INTERVAL_DESC" %]
+    <div class="prefDesc">
+        <select name="pref_photo_interval" class="stdedit">
+                <option value="30"[% IF prefs.photo_interval == "30" %] selected[% END %]>[% 'PLUGIN_SEVA_INTERVAL_30S' | getstring %]</option>
+                <option value="60"[% IF prefs.photo_interval == "60" %] selected[% END %]>[% 'PLUGIN_SEVA_INTERVAL_1M' | getstring %]</option>            
+                <option value="180"[% IF prefs.photo_interval == "180" %] selected[% END %]>[% 'PLUGIN_SEVA_INTERVAL_3M' | getstring %]</option>
+                <option value="300"[% IF prefs.photo_interval == "300" %] selected[% END %]>[% 'PLUGIN_SEVA_INTERVAL_5M' | getstring %]</option>
+        </select>
+    </div>
+    [% END %]
+
+[% PROCESS settings/footer.html %]

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<extension>
+    <name>PLUGIN_SEVA</name>
+    <module>Plugins::Seva::Plugin</module>
+    <version>0.2.0</version>
+    <description>PLUGIN_SEVA_DESC</description>
+    <defaultState>enabled</defaultState>
+    <targetApplication>
+        <id>SlimServer</id>
+        <minVersion>7.9</minVersion>
+        <maxVersion>*</maxVersion>
+    </targetApplication>
+    <optionsURL>plugins/Seva/settings/basic.html</optionsURL>
+    <icon>plugins/Seva/html/images/radio.png</icon>
+    <creator>Alexander Chernysh</creator>
+    <homepageURL>https://seva.ru/</homepageURL>
+</extension>
