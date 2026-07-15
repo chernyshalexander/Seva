@@ -95,7 +95,7 @@ sub shutdownPlugin {
 }
 
 sub _makeSevaUrl {
-    my ($real_url, $title, $album) = @_;
+    my ($real_url, $title, $album, $bitrate) = @_;
     # strip https:// or http://
     my $path = $real_url;
     $path =~ s|^https?://||i;
@@ -105,6 +105,10 @@ sub _makeSevaUrl {
     my $esc_album = URI::Escape::uri_escape_utf8($album || '');
     
     my $seva_url = "seva://" . $path . "?title=" . $esc_title . "&album=" . $esc_album;
+    if ($bitrate) {
+        $seva_url .= "&bitrate=" . $bitrate;
+    }
+    
     $log->info("Formatting Seva URL: $real_url -> $seva_url");
     return $seva_url;
 }
@@ -116,7 +120,7 @@ sub _feedHandler {
         {
             name  => string('PLUGIN_SEVA_LIVE'),
             type  => 'audio',
-            url   => _makeSevaUrl('https://seva.ru/radio/stream', string('PLUGIN_SEVA_LIVE'), string('PLUGIN_SEVA_LIVE')),
+            url   => _makeSevaUrl('https://seva.ru/radio/stream', string('PLUGIN_SEVA_LIVE'), string('PLUGIN_SEVA_LIVE'), 128000),
             image => 'plugins/Seva/html/images/radio.png',
         },
         {
@@ -203,7 +207,16 @@ sub _rockEpisodesHandler {
                     }
                     
                     my $url = "";
-                    if ($row =~ /<a\s+href="([^"]+\.mp3)"/s) {
+                    my $bitrate = 128000; # fallback default
+                    
+                    if ($row =~ /<a\s+href="([^"]+\.mp3)"[^>]*>(.*?)<\/a>/is) {
+                        $url = $1;
+                        my $link_content = $2;
+                        if ($link_content =~ /alt="([^"]*?MP3\s+(\d+)\s*kbps[^"]*)"/is) {
+                            $bitrate = $2 * 1000;
+                            $log->info("Parsed rock episode bitrate: $bitrate bps from alt='$1'");
+                        }
+                    } elsif ($row =~ /<a\s+href="([^"]+\.mp3)"/s) {
                         $url = $1;
                     }
                     
@@ -219,7 +232,7 @@ sub _rockEpisodesHandler {
                             $mp3_url = "https://seva.ru/rock/" . $mp3_url;
                         }
                         
-                        my $seva_url = _makeSevaUrl($mp3_url, $title, string('PLUGIN_SEVA_ROCK'));
+                        my $seva_url = _makeSevaUrl($mp3_url, $title, string('PLUGIN_SEVA_ROCK'), $bitrate);
                         push @items, {
                             name   => "$date - $title",
                             title  => $title,
@@ -320,7 +333,16 @@ sub _oborotEpisodesHandler {
                     }
                     
                     my $url = "";
-                    if ($row =~ /<a\s+href="([^"]+\.mp3)"/s) {
+                    my $bitrate = 128000; # fallback default
+                    
+                    if ($row =~ /<a\s+href="([^"]+\.mp3)"[^>]*>(.*?)<\/a>/is) {
+                        $url = $1;
+                        my $link_content = $2;
+                        if ($link_content =~ /alt="([^"]*?MP3\s+(\d+)\s*kbps[^"]*)"/is) {
+                            $bitrate = $2 * 1000;
+                            $log->info("Parsed oborot episode bitrate: $bitrate bps from alt='$1'");
+                        }
+                    } elsif ($row =~ /<a\s+href="([^"]+\.mp3)"/s) {
                         $url = $1;
                     }
                     
@@ -336,7 +358,7 @@ sub _oborotEpisodesHandler {
                             $mp3_url = "https://seva.ru/oborot/archive/" . $mp3_url;
                         }
                         
-                        my $seva_url = _makeSevaUrl($mp3_url, $title, string('PLUGIN_SEVA_OBOROT'));
+                        my $seva_url = _makeSevaUrl($mp3_url, $title, string('PLUGIN_SEVA_OBOROT'), $bitrate);
                         push @items, {
                             name   => "$date - $title",
                             title  => $title,

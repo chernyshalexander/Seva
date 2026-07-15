@@ -11,7 +11,7 @@
         <maxVersion>*</maxVersion>
     </targetApplication>
     <optionsURL>plugins/Seva/settings/basic.html</optionsURL>
-    <icon>plugins/Seva/html/images/radio.png</icon>
+    <icon>plugins/Seva/html/images/ss-logo_svg.png</icon>
     <creator>Alexander Chernysh</creator>
     <homepageURL>https://seva.ru/</homepageURL>
 </extension>
