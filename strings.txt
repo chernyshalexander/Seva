@@ -61,3 +61,28 @@ PLUGIN_SEVA_INTERVAL_3M
 PLUGIN_SEVA_INTERVAL_5M
 	EN	5 minutes
 	RU	5 минут
+
+PLUGIN_SEVA_PROXY
+	EN	Use HTTP Proxy
+	RU	Использовать HTTP прокси
+
+PLUGIN_SEVA_PROXY_DESC
+	EN	Route all seva.ru requests through the proxy
+	RU	Маршрутизировать все запросы к seva.ru через прокси
+
+PLUGIN_SEVA_PROXY_ADDRESS
+	EN	Proxy Host/IP
+	RU	Адрес прокси
+
+PLUGIN_SEVA_PROXY_PORT
+	EN	Proxy Port
+	RU	Порт прокси
+
+PLUGIN_SEVA_PROXY_USERNAME
+	EN	Username (optional)
+	RU	Имя пользователя (опционально)
+
+PLUGIN_SEVA_PROXY_PASSWORD
+	EN	Password (optional)
+	RU	Пароль (опционально)
+

@@ -17,7 +17,7 @@ sub page {
 }
 
 sub prefs {
-    return ($prefs, qw(demostrate_photos photo_interval));
+    return ($prefs, qw(demostrate_photos photo_interval use_proxy proxy_address proxy_port proxy_username proxy_password));
 }
 
 1;

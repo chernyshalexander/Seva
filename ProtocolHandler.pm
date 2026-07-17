@@ -6,6 +6,8 @@ use base qw(Slim::Player::Protocols::HTTPS);
 
 use Slim::Utils::Log;
 use Slim::Utils::Strings qw(string);
+use Slim::Utils::Prefs;
+use IO::Select;
 use URI::Escape qw(uri_unescape);
 use Encode qw(decode);
 
@@ -24,6 +26,42 @@ sub new {
     my $streamUrl = $song->streamUrl() || return;
     
     $log->info("ProtocolHandler new: connecting to resolved streamUrl: $streamUrl");
+    
+    my $prefs = Slim::Utils::Prefs::preferences('plugin.seva');
+    if ($prefs->get('use_proxy')) {
+        my $proxy_addr = $prefs->get('proxy_address');
+        my $proxy_port = $prefs->get('proxy_port');
+        my $proxy_user = $prefs->get('proxy_username');
+        my $proxy_pass = $prefs->get('proxy_password');
+        
+        my ($server, $port, $path) = Slim::Utils::Misc::crackURL($streamUrl);
+        my $insecure = Slim::Utils::Prefs::preferences('server')->get('insecureHTTPS') || 0;
+        my $timeout = $args->{timeout} || Slim::Utils::Prefs::preferences('server')->get('remotestreamtimeout') || 10;
+        
+        $log->info("ProtocolHandler new intercept: connecting to $server:$port via HTTP proxy $proxy_addr:$proxy_port");
+        
+        my $sock = Plugins::Seva::Plugin::connect_via_proxy(
+            'http', $proxy_addr, $proxy_port, $proxy_user, $proxy_pass,
+            $server, $port, 1, $timeout, $insecure
+        );
+        
+        if (!$sock) {
+            $log->error("ProtocolHandler new intercept: proxy connection failed");
+            return undef;
+        }
+        
+        # Bless into the ProtocolHandler class
+        bless $sock, $class;
+        
+        # Set the required metadata fields expected by Slim::Player::Protocols::HTTP / HTTPS
+        ${*$sock}{'client'}  = $client;
+        ${*$sock}{'url'}     = $streamUrl;
+        ${*$sock}{'song'}    = $song;
+        ${*$sock}{'_sel'}    = IO::Select->new($sock);
+        
+        # Call open ($sock->open is Slim::Player::Protocols::HTTP::open)
+        return $sock->open($args);
+    }
     
     my $sock = $class->SUPER::new({
         url    => $streamUrl,

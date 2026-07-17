@@ -20,4 +20,37 @@
     </div>
     [% END %]
 
+    [% WRAPPER setting title="PLUGIN_SEVA_PROXY" desc="PLUGIN_SEVA_PROXY_DESC" %]
+    <div class="prefDesc">
+        <select name="pref_use_proxy" class="stdedit">
+                <option value="1"[% IF prefs.use_proxy == "1" %] selected[% END %]>[% 'PLUGIN_SEVA_SETTING_ENABLE' | getstring %]</option>
+                <option value="0"[% IF prefs.use_proxy == "0" %] selected[% END %]>[% 'PLUGIN_SEVA_SETTING_DISABLE' | getstring %]</option> 
+        </select>
+    </div>
+    [% END %]
+
+    [% WRAPPER setting title="PLUGIN_SEVA_PROXY_ADDRESS" %]
+    <div class="prefDesc">
+        <input name="pref_proxy_address" type="text" class="stdedit" value="[% prefs.proxy_address %]" size="40">
+    </div>
+    [% END %]
+
+    [% WRAPPER setting title="PLUGIN_SEVA_PROXY_PORT" %]
+    <div class="prefDesc">
+        <input name="pref_proxy_port" type="text" class="stdedit" value="[% prefs.proxy_port %]" size="10">
+    </div>
+    [% END %]
+
+    [% WRAPPER setting title="PLUGIN_SEVA_PROXY_USERNAME" %]
+    <div class="prefDesc">
+        <input name="pref_proxy_username" type="text" class="stdedit" value="[% prefs.proxy_username %]" size="20">
+    </div>
+    [% END %]
+
+    [% WRAPPER setting title="PLUGIN_SEVA_PROXY_PASSWORD" %]
+    <div class="prefDesc">
+        <input name="pref_proxy_password" type="password" class="stdedit" value="[% prefs.proxy_password %]" size="20">
+    </div>
+    [% END %]
+
 [% PROCESS settings/footer.html %]

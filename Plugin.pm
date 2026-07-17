@@ -44,6 +44,11 @@ sub initPlugin {
     $prefs->init({
         demostrate_photos => 1,
         photo_interval => 180,
+        use_proxy => 0,
+        proxy_address => '',
+        proxy_port => '',
+        proxy_username => '',
+        proxy_password => '',
     });
     
     # Listen to changes in settings
@@ -59,6 +64,9 @@ sub initPlugin {
     # Register seva:// protocol handler
     Slim::Player::ProtocolHandlers->registerHandler('seva', 'Plugins::Seva::ProtocolHandler');
     $log->info("SEVA INIT: seva:// ProtocolHandler registered.");
+    
+    # Apply monkeypatch to route SimpleAsyncHTTP calls to seva.ru through HTTP proxy if configured
+    _patch_async_http_new_socket();
     
     # Subscribe to player events (newsong, play, pause, stop, clear)
     Slim::Control::Request::subscribe(
@@ -557,6 +565,129 @@ sub _on_pref_change {
             }
         }
     }
+}
+
+sub connect_via_proxy {
+    my ($proxy_type, $proxy_addr, $proxy_port, $proxy_user, $proxy_pass, $dest_host, $dest_port, $is_https, $timeout, $insecure_https) = @_;
+    
+    $timeout ||= 10;
+    
+    $log->info("connect_via_proxy: connecting to proxy $proxy_addr:$proxy_port");
+    
+    require IO::Socket::INET;
+    my $sock = IO::Socket::INET->new(
+        PeerAddr => $proxy_addr,
+        PeerPort => $proxy_port,
+        Timeout  => $timeout,
+    );
+    
+    if (!$sock) {
+        $log->error("connect_via_proxy: TCP connection to proxy $proxy_addr:$proxy_port failed: $!");
+        return undef;
+    }
+    
+    # Establish tunnel using CONNECT method
+    my $connect_req = "CONNECT $dest_host:$dest_port HTTP/1.1\r\n"
+                    . "Host: $dest_host:$dest_port\r\n";
+    
+    if ($proxy_user) {
+        require MIME::Base64;
+        my $auth = MIME::Base64::encode_base64("$proxy_user:$proxy_pass", "");
+        $connect_req .= "Proxy-Authorization: Basic $auth\r\n";
+    }
+    $connect_req .= "\r\n";
+    
+    $sock->syswrite($connect_req);
+    
+    # Read response headers
+    my $response = '';
+    my $buf = '';
+    while (1) {
+        my $n = $sock->sysread($buf, 1);
+        last if !$n;
+        $response .= $buf;
+        last if $response =~ /\r\n\r\n$/;
+    }
+    
+    if ($response !~ /^HTTP\/1\.[01]\s+200/) {
+        $log->error("connect_via_proxy: proxy tunnel establishment failed:\n$response");
+        $sock->close();
+        return undef;
+    }
+    
+    $log->info("connect_via_proxy: proxy tunnel established successfully to $dest_host:$dest_port");
+    
+    # If HTTPS, wrap socket with SSL
+    if ($is_https) {
+        require IO::Socket::SSL;
+        
+        my %ssl_args = (
+            SSL_hostname => $dest_host,
+        );
+        if ($insecure_https) {
+            $ssl_args{SSL_verify_mode} = 0; # SSL_VERIFY_NONE
+        }
+        
+        $sock = IO::Socket::SSL->start_SSL($sock, %ssl_args);
+        if (!$sock) {
+            $log->error("connect_via_proxy: SSL handshake over HTTP proxy failed: " . IO::Socket::SSL->errstr());
+            return undef;
+        }
+        $log->info("connect_via_proxy: SSL handshake over HTTP proxy completed successfully");
+    }
+    
+    return $sock;
+}
+
+sub _patch_async_http_new_socket {
+    require Slim::Networking::Async::HTTP;
+    
+    my $orig_new_socket = \&Slim::Networking::Async::HTTP::new_socket;
+    
+    no warnings 'redefine';
+    *Slim::Networking::Async::HTTP::new_socket = sub {
+        my $self = shift;
+        my %args = @_;
+        
+        my $host = $self->request->uri->host;
+        
+        if ($host =~ /seva\.ru/i && $prefs->get('use_proxy')) {
+            my $proxy_addr = $prefs->get('proxy_address');
+            my $proxy_port = $prefs->get('proxy_port');
+            my $proxy_user = $prefs->get('proxy_username');
+            my $proxy_pass = $prefs->get('proxy_password');
+            
+            my $dest_host = $host;
+            my $dest_port = $self->request->uri->port || 443;
+            my $is_https = ($self->request->uri->scheme eq 'https');
+            
+            my $insecure = Slim::Utils::Prefs::preferences('server')->get('insecureHTTPS') || 0;
+            my $timeout = $args{Timeout} || 10;
+            
+            $log->info("SimpleAsyncHTTP new_socket intercept: connecting to $dest_host:$dest_port via HTTP proxy $proxy_addr:$proxy_port");
+            
+            my $sock = connect_via_proxy(
+                'http', $proxy_addr, $proxy_port, $proxy_user, $proxy_pass,
+                $dest_host, $dest_port, $is_https, $timeout, $insecure
+            );
+            
+            if ($sock) {
+                my $target_class = $is_https 
+                    ? 'Slim::Networking::Async::Socket::HTTPS' 
+                    : 'Slim::Networking::Async::Socket::HTTP';
+                bless $sock, $target_class;
+                
+                $sock->blocking(0);
+                
+                return $sock;
+            } else {
+                $log->error("SimpleAsyncHTTP intercept: proxy connection failed");
+                return undef;
+            }
+        }
+        
+        return $orig_new_socket->($self, @_);
+    };
 }
 
 1;
