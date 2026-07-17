@@ -22,7 +22,7 @@
 1. Скопируйте папку `Seva` в директорию плагинов вашего сервера LMS (обычно это папка `Plugins` внутри рабочей директории сервера).
 2. Убедитесь, что папка переименована в `Seva` (структура: `Plugins/Seva/Plugin.pm`, `Plugins/Seva/install.xml` и т.д.).
 3. Перезапустите Lyrion Music Server.
-4. Плагин должен появиться в разделе плагинов и в меню «Радио» / «Мои приложения».
+4. Плагин должен появиться в разделе плагинов и в меню «Мои приложения».
 
 ## Установка (из репозитория)
 
@@ -57,7 +57,7 @@ This plugin adds support for playing the **Radio Seva** live stream and archived
 1. Copy the `Seva` folder into your LMS Plugins directory (usually `Plugins` inside the server’s working directory).
 2. Make sure the folder is named exactly Seva (structure: Plugins/Seva/Plugin.pm, Plugins/Seva/install.xml, etc.).
 3. Restart Lyrion Music Server.
-4. The plugin should appear in the Plugins section and in the Radio / My Apps menu.
+4. The plugin should appear in the Plugins section and in the My Apps menu.
 
 ## Installation (from Repository)
 
